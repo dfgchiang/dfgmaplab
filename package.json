@@ -1,0 +1,11 @@
+{
+    "name": "dfgmaplab",
+    "description": "DFG Map Lab Node.js test for Azure App Service",
+    "version": "1.0.1",
+    "private": true,
+    "license": "GPL3",
+    "author": "dfgchiang",
+    "scripts": {
+        "start": "node index.js"
+    }
+}
