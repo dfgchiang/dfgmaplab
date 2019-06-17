@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>collar locator</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1" />
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta name="author" content="dfgchiang">
+    <meta name="description" content="">
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <!--<link rel="stylesheet" href="https://js.arcgis.com/4.11/esri/css/main.css">-->
+    <link rel="stylesheet" href="https://js.arcgis.com/4.11/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.11/"></script>
+    <script src="https://dfgchiang.github.io/js/abc.js"></script>
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        aside {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            top: 53px;
+            background-color: white;
+            border-left: 1px solid silver;
+            height: auto;
+            width: 30%;
+        }
+
+        body {
+            font-family: sans-serif;
+            font-size: 123%;
+        }
+
+        button {
+            font-size: 100%;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: auto;
+            background-color: white;
+            border-top: 1px solid silver;
+            padding: 10px;
+        }
+
+        header {
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: 0;
+            height: 50px;
+            background-color: white;
+            border-bottom: 1px solid silver;
+            padding: 10px;
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        input {
+            font-size: 100%;
+            width: 80%;
+            padding: 5px;
+        }
+
+        label {
+            color: dimgray;
+        }
+
+        main {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 30%;
+            top: 53px;
+            height: auto;
+            background-color: white;
+            overflow: hidden;
+        }
+
+        ol.picklist {
+            border: 1px solid silver;
+            max-height: 50%;
+            overflow: auto;
+            padding: 0;
+        }
+
+            ol.picklist li {
+                border: 1px solid azure;
+                cursor: default;
+                line-height: 150%;
+                margin: 0;
+            }
+
+                ol.picklist li:hover {
+                    background-color: azure;
+                    border: 1px solid lightsteelblue;
+                }
+
+        .container {
+            position: relative;
+            padding: 1em;
+        }
+
+        .panel {
+            padding: 10px;
+        }
+
+        #resultsDiv {
+            position: relative;
+            height: 555px;
+            /* PERCENTAGE HEIGHT DOES NOT WORK? */
+            background-color: whitesmoke;
+            border: 1px solid gainsboro;
+            overflow: auto;
+        }
+    </style>
+    <script type="text/javascript">
+        window.addEventListener('load', function () {
+            var msg = poplinks();
+            var ht = window.innerHeight;
+            $('resultsDiv').style.height = parseInt(ht * .55) + 'px';
+            console.log('Calculated resultsDiv.style.height=' + parseInt(ht * .55) + 'px');
+        });
+    </script>
+    <script>
+        var esrequest = null;
+        var getcollar = null;
+        //var proxyUrl = '../../proxy.ashx';
+        require([
+            "esri/config",
+            "esri/request",
+            "esri/core/urlUtils"
+        ], function (
+            esriConfig,
+            esriRequest,
+            urlUtils
+        ) {
+            esriConfig.geometryServiceUrl = "https://utility.arcgisonline.com/arcgis/rest/services/Geometry/GeometryServer";
+            //esriConfig.portalUrl = "https://gis.wildlife.ca.gov/arcgis";
+            //esriConfig.request.proxyUrl = proxyUrl;
+            //esriConfig.request.forceProxy = true; // 4.9_DEPRECATED
+            esriConfig.request.useIdentity = false; // Removed agol login prompt on startup
+            /*urlUtils.addProxyRule({
+                urlPrefix: "https://services2.arcgis.com",
+                proxyUrl: proxyUrl
+            });
+            urlUtils.addProxyRule({
+                urlPrefix: "https://tiles.arcgis.com",
+                proxyUrl: proxyUrl
+            });
+            urlUtils.addProxyRule({
+                urlPrefix: "https://gisdev.ad.dfg.ca.gov",
+                proxyUrl: proxyUrl
+            });
+            urlUtils.addProxyRule({
+                urlPrefix: "https://wombat.vectronic-wildlife.com:9443",
+                proxyUrl: proxyUrl
+            });*/
+
+            esrequest = esriRequest;
+            var resultsDiv = document.getElementById("resultsDiv");
+            var input = document.getElementById("inputUrl");
+            var options = {
+                query: {
+                    f: "json"
+                },
+                responseType: "json"
+            };
+
+            // Make the request on a button click using the
+            // value of the 'input' text.
+            //on(btnQuery, "click", function() {
+            btnQuery.addEventListener("click", function () {
+                var url = input.value;
+                esriRequest(url, options).then(function (response) {
+                    console.log("response", response);
+                    var responseJSON = JSON.stringify(response, null, 2);
+                    resultsDiv.innerHTML = responseJSON;
+                });
+            });
+            var requrl = 'https://wombat.vectronic-wildlife.com:9443/v2/collar/COLLARID/gps';//?collarkey=
+            var collaridkeys = {
+                18461: "68C9B8A4BAD4EC91BA2E6582DFC6E5B5D2EFEAF18DA697AD6ED87DA8CD6179B36F420223714105432FD39CC11EF71511EA486D1669B2E7DF3398A2B30850E619AECA40B1A8C614CED47B66F8DEF6DC324816DE62F06F46114CF66B9D857F2801D3A12AF37E157ACB60D9C5E4868A1D0E8304AFDA39D64FD9DB24A156852BEDDBE27782091E3973B4D59F6D79E2B0F0471038D2C45C763A50454FCD4F664CB6F44F2D8BA71BA9FEF2BF182ECF8E57623B4F4CA019BBA813924474F6423C481E6A791AE37C43C36E920FDEC90B3F65CDCB647BC92A0476081846141E3F155C87970B04DF4E83060CB9D98840EA50C3D42BF1B51769E72F163ED89FA055B302C24E"
+            };//// TODO:  add more key-values to this json for all collars
+            // and then dynamically generate the picklist
+            getcollar = function (x) {
+                var uiid = x.id;
+                var collarid = uiid.split('-')[1];
+                var collarkey = x.getAttribute('data-key');
+                $('collarid').innerHTML = collarid;
+                $('collarkey').innerHTML = collarkey;
+                var qurl = requrl.replace('COLLARID', collarid);
+                $('inputUrl').value = qurl;
+                var arg2 = '&afterAcquisition=2019-06-14T01:01:01'
+                qurl = qurl + arg2;
+                var options = {
+                    query: {
+                        collarkey: collarkey,
+                        afterAcquisition: "2019-06-14T01:01:01"
+                    },
+                    responseType: "json"
+                };
+                esriRequest(qurl, options).then(function (response) {
+                    var res = response;
+                    console.log("response-length: ", response.length);
+                    var responseJSON = JSON.stringify(response, null, 2);
+                    resultsDiv.innerHTML = responseJSON;
+                });
+            }
+            console.log('DONE AMD REQUIRED');
+        });
+    </script>
+</head>
+<body>
+    <main>
+        <div class="container">
+            <div>
+                <h2>Using esri/request</h2>
+                <button id="btnQuery">Make Request</button>
+                <input id="inputUrl"
+                       type="text"
+                       value="https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer" />
+            </div>
+            <pre id="resultsDiv"></pre>
+            <pre>20190614 Even with proxy still getting 404 error trying to reach vectronic server</pre>
+        </div>
+    </main>
+    <aside class="">
+        <h2>
+            Pick a Collar
+        </h2>
+        <div class="panel">
+            <ol class="picklist">
+                <li onclick="getcollar(this)" id="deer-18461" data-key="68C9B8A4BAD4EC91BA2E6582DFC6E5B5D2EFEAF18DA697AD6ED87DA8CD6179B36F420223714105432FD39CC11EF71511EA486D1669B2E7DF3398A2B30850E619AECA40B1A8C614CED47B66F8DEF6DC324816DE62F06F46114CF66B9D857F2801D3A12AF37E157ACB60D9C5E4868A1D0E8304AFDA39D64FD9DB24A156852BEDDBE27782091E3973B4D59F6D79E2B0F0471038D2C45C763A50454FCD4F664CB6F44F2D8BA71BA9FEF2BF182ECF8E57623B4F4CA019BBA813924474F6423C481E6A791AE37C43C36E920FDEC90B3F65CDCB647BC92A0476081846141E3F155C87970B04DF4E83060CB9D98840EA50C3D42BF1B51769E72F163ED89FA055B302C24E">18461</li>
+            </ol>
+            <h3>Selected</h3>
+            <label for="">Collar ID</label>:
+            <span id="collarid"></span><br>
+            <label for="">Collar key</label>:
+            <p class="" id="collarkey"></p>
+        </div>
+    </aside>
+    <header>
+        <h1>Collar Locator</h1>
+        <div style="position: absolute; bottom: 5px; right: 5px; font-size: smaller;">
+            <script>
+                document.write(document.lastModified);
+            </script>
+        </div>
+    </header>
+    <nav>
+        <ul>
+            <li></li>
+        </ul>
+    </nav>
+    <footer>
+        <a href="https://www.vectronic-aerospace.com/wp-content/uploads/2018/11/VECTRONIC-Aerospace-HTTP-Wildlife-API-2.pdf">
+            VECTRONIC Wildlife API doc
+        </a>
+    </footer>
+</body>
+</html>

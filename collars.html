@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>collars</title>
+    </head>
+    <body>
+        <ol>
+            <li>
+                Each call can be retrieve one or more array items in the json.
+                Each item consists of a time stamp and position of collar.
+                This is an example of an item record.
+                <pre>
+{"idPosition":79274577,
+"idCollar":18461,"acquisitionTime":"2019-06-14T20:00:32",
+"scts":"2019-06-15T04:02:39",
+"originCode":"I",
+"ecefX":-2511112,
+"ecefY":-4072158,
+"ecefZ":4206564,
+"latitude":41.5150595679371,"longitude":121.660220002237,
+"height":1719,
+"dop":3.4,
+"idFixType":5,
+"positionError":null,
+"satCount":0,
+"ch01SatId":null,"ch01SatCnr":null,"ch02SatId":null,"ch02SatCnr":null,
+"ch03SatId":null,"ch03SatCnr":null,"ch04SatId":null,"ch04SatCnr":null,
+"ch05SatId":null,"ch05SatCnr":null,"ch06SatId":null,"ch06SatCnr":null,
+"ch07SatId":null,"ch07SatCnr":null,"ch08SatId":null,"ch08SatCnr":null,
+"ch09SatId":null,"ch09SatCnr":null,"ch10SatId":null,"ch10SatCnr":null,
+"ch11SatId":null,"ch11SatCnr":null,"ch12SatId":null,"ch12SatCnr":null,
+"idMortalityStatus":1,"activity":null,"mainVoltage":3.68,
+"backupVoltage":3.76,"temperature":28.0,
+"transformedX":null,"transformedY":null}
+                </pre>
+            </li>
+            <li>
+                Page 5 of the API document gives an example of querying for
+                certain date time using this URL format:
+                <code>
+                    /collar/{collarID}/act?collarkey={key}&afterAcquisition={YYYY-MM-DDTHH:MM:SS}
+                </code>
+                which may result in fewer records than full response
+                <pre>
+(base) ssis-14940:nodelab dean$ node httpsget.js
+2019-06-14T14:00:32
+-121.658613592584
+41.5221279440098
+                </pre>
+            </li>
+        </ol>
+    </body>
+</html>
