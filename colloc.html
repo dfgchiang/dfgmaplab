@@ -132,7 +132,8 @@
         window.addEventListener('load', function () {
             var msg = poplinks();
             var ht = window.innerHeight;
-            $('resultsDiv').style.height = parseInt(ht * .55) + 'px';
+            document.getElementById('inputUrl').value = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer';
+            document.getElementById('resultsDiv').style.height = parseInt(ht * .55) + 'px';
             console.log('Calculated resultsDiv.style.height=' + parseInt(ht * .55) + 'px');
         });
     </script>
@@ -198,28 +199,50 @@
             };//// TODO:  add more key-values to this json for all collars
             // and then dynamically generate the picklist
             getcollar = function (x) {
+                // caller: li.onclick
                 var uiid = x.id;
                 var collarid = uiid.split('-')[1];
                 var collarkey = x.getAttribute('data-key');
                 $('collarid').innerHTML = collarid;
                 $('collarkey').innerHTML = collarkey;
-                var qurl = requrl.replace('COLLARID', collarid);
-                $('inputUrl').value = qurl;
-                var arg2 = '&afterAcquisition=2019-06-14T01:01:01'
-                qurl = qurl + arg2;
+                var url = requrl.replace('COLLARID', collarid);
+                $('inputUrl').value = url;
                 var options = {
                     query: {
                         collarkey: collarkey,
-                        afterAcquisition: "2019-06-14T01:01:01"
+                        afterAcquisition: "2019-06-17T00:00:01"
                     },
                     responseType: "json"
                 };
-                esriRequest(qurl, options).then(function (response) {
+                esriRequest(url, options).then(function (response) {
                     var res = response;
                     console.log("response-length: ", response.length);
                     var responseJSON = JSON.stringify(response, null, 2);
                     resultsDiv.innerHTML = responseJSON;
                 });
+            }
+            // Use plain XMLHttpRequest instead of esriRequest-20190617=FAIL too no diff
+            httpget = function(x) {
+                var uiid = x.id;
+                var collarid = uiid.split('-')[1];
+                var collarkey = x.getAttribute('data-key');
+                document.getElementById('collarid').innerHTML = collarid;
+                document.getElementById('collarkey').innerHTML = collarkey;
+                var url = requrl.replace('COLLARID', collarid);
+                document.getElementById('inputUrl').value = url;
+                var arg1 = '?collarkey=' + collarkey;
+                var arg2 = '&afterAcquisition=2019-06-17T00:00:01'
+                url = url + arg1 + arg2;
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                       // Typical action to be performed when the document is ready:
+                       document.getElementById("resultsDiv").innerHTML = xhttp.responseText;
+                    }
+                };
+                xhttp.open("GET", url, true);
+                xhttp.send();
+                console.log('DONE httpget ' + x.id);
             }
             console.log('DONE AMD REQUIRED');
         });
@@ -233,7 +256,7 @@
                 <button id="btnQuery">Make Request</button>
                 <input id="inputUrl"
                        type="text"
-                       value="https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer" />
+                       value="" />
             </div>
             <pre id="resultsDiv"></pre>
             <pre>20190614 Even with proxy still getting 404 error trying to reach vectronic server</pre>
