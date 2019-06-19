@@ -20,7 +20,7 @@ http.createServer(function (request, response) {
         var id = parseInt(request.url.split('collarid=')[1]);
         if (collars[id] !== undefined) {
             var token = collars[id];
-            var arg2 = '&afterAcquisition=2019-06-17T12:34:56';
+            var arg2 = '&afterAcquisition=2019-06-17T00:00:01';
             qurl = qurl.replace('COLLARID', id) + token + arg2;
             https.get(qurl, (resp) => {
               let data = '';
